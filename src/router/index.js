@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import HelloWorld from '@/components/HelloWorld';
+// import HelloWorld from '@/components/HelloWorld';
 import Login from '@/components/pages/Login';
 import Dashboard from '@/components/Dashboard';
+import Products from '@/components/pages/Products';
 
 Vue.use(Router);
 
@@ -14,12 +15,13 @@ export default new Router({
       path: '*',
       redirect: 'login',
     },
-    {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld,
-      meta: { requiresAuth: true }, // 路由元信息
-    },
+    // {
+    //   path: '/',
+    //   name: 'HelloWorld',
+    //   component: HelloWorld,
+    //   // 路由元信息，確保進入這個頁面前是需要被驗證的
+    //   meta: { requiresAuth: true },
+    // },
     {
       path: '/login',
       name: 'Login',
@@ -29,7 +31,13 @@ export default new Router({
       path: '/admin',
       name: 'Dashboard',
       component: Dashboard,
-      meta: { requiresAuth: true },
+      children: [{
+        path: '/admin/products',
+        name: 'Products',
+        component: Products,
+        // 路由元信息，確保進入此頁面時是需要被驗證
+        meta: { requiresAuth: true },
+      }],
     },
   ],
 });

@@ -38,7 +38,7 @@ export default {
         //post(api ,vm.user) => vm.user是API規定要傳入參數
         console.log(response.data);
         if(response.data.success){
-          vm.$router.push('/');
+          vm.$router.push('/admin/products');
         }
       })
     }
