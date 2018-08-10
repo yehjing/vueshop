@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- Loading 套件 -->
+    <loading :active.sync="isLoading"></loading>
+    <!-- Loading 套件 end-->
     <div class="text-right">
       <button class="mt-4 btn btn-success" @click="openProductModal(true)">建立新的產品</button>
     </div>
@@ -58,7 +61,7 @@
                 </div>
                 <div class="form-group">
                   <label for="customFile">或 上傳圖片
-                    <i class="fas fa-spinner fa-spin"></i>
+                    <i class="fas fa-spinner fa-spin" v-if="status.fileUploading"></i>
                   </label>
                   <input type="file" id="customFile" class="form-control" ref="files" @change="uploadFile">
                 </div>
@@ -170,7 +173,12 @@ export default {
       products: [],
       tempProduct: {},
       // 此項商品是否為新增商品
-      isNew: false
+      isNew: false,
+      // Loading 套件
+      isLoading:false,
+      status:{
+        fileUploading:false,
+      }
     };
   },
   methods: {
@@ -180,8 +188,10 @@ export default {
         process.env.CUSTOMPATH
       }/admin/products`;
       const vm = this;
+      vm.isLoading = true;
       this.$http.get(api).then(response => {
         // console.log(response.data.products);
+        vm.isLoading = false;
         // 把商品列表存入data陣列中
         vm.products = response.data.products;
       });
@@ -252,12 +262,14 @@ export default {
       // 定義路徑
       const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
       // 送出 formData
+      vm.status.fileUploading = true;
       this.$http.post(api, formData, {
         headers:{
           'Content-Type': 'multipart/form-data'
         }
       }).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
+        vm.status.fileUploading = false;
         if (res.data.success) {
           // 如果成功就把路徑存到 tempProduct.imageUrl 裡
           // vm.tempProduct.imageUrl = res.data.imageUrl;
