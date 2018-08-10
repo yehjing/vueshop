@@ -60,7 +60,7 @@
                   <label for="customFile">或 上傳圖片
                     <i class="fas fa-spinner fa-spin"></i>
                   </label>
-                  <input type="file" id="customFile" class="form-control" ref="files">
+                  <input type="file" id="customFile" class="form-control" ref="files" @change="uploadFile">
                 </div>
                 <img img="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=828346ed697837ce808cae68d3ddc3cf&auto=format&fit=crop&w=1350&q=80"
                   class="img-fluid" alt="" :src="tempProduct.imageUrl">
@@ -238,6 +238,33 @@ export default {
         $("#delProductModal").modal("hide");
         // 重新取得商品列表
         this.getProducts();
+      })
+    },
+    // 檔案上傳
+    uploadFile() {
+      // console 查看檔案位置 在 this.$refs.files.files array 裡
+      // console.log(this);
+      const uploadedFile = this.$refs.files.files[0];
+      const vm = this;
+      // 建立一個 formData 物件
+      const formData = new FormData();
+      formData.append('file-to-upload', uploadedFile);
+      // 定義路徑
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/upload`;
+      // 送出 formData
+      this.$http.post(api, formData, {
+        headers:{
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(res => {
+        console.log(res.data)
+        if (res.data.success) {
+          // 如果成功就把路徑存到 tempProduct.imageUrl 裡
+          // vm.tempProduct.imageUrl = res.data.imageUrl;
+          // console.log(vm.tempProduct);
+          // 把路徑強制寫入跟圖片網址做雙向綁定
+          vm.$set(vm.tempProduct, 'imageUrl', res.data.imageUrl);
+        }
       })
     }
   },
