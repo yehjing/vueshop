@@ -11,7 +11,7 @@
           <th width="120" class="text-right">原價</th>
           <th width="120" class="text-right">售價</th>
           <th width="100">是否啟用</th>
-          <th width="100">編輯</th>
+          <th width="140">編輯</th>
         </tr>
       </thead>
       <tbody>
@@ -30,6 +30,7 @@
           </td>
           <td>
             <button class="btn btn-outline-primary btn-sm" @click="openProductModal(false, item)">編輯</button>
+            <button class="btn btn-outline-danger btn-sm" @click="openDelProductModal(item)">刪除</button>
           </td>
         </tr>
       </tbody>
@@ -130,7 +131,10 @@
         </div>
       </div>
     </div>
-    <!-- <div class="modal fade" id="delProductModal" tabindex="-1" role="dialog"
+    <!-- productModal end-->
+
+    <!-- delProductModal start -->
+    <div class="modal fade" id="delProductModal" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content border-0">
@@ -143,17 +147,16 @@
             </button>
           </div>
           <div class="modal-body">
-            是否刪除 <strong class="text-danger">{{ tempProduct.title }}</strong> 商品(刪除後將無法恢復)。
+            是否刪除 <strong class="text-danger">{{tempProduct.title}}</strong> 商品(刪除後將無法恢復)。
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-danger"
-              >確認刪除</button>
+            <button type="button" class="btn btn-danger" @click="delProduct">確認刪除</button>
           </div>
         </div>
       </div>
-    </div> -->
-    <!-- productModal end-->
+    </div>
+    <!-- delProductModal end-->
   </div>
 </template>
 
@@ -167,13 +170,15 @@ export default {
       products: [],
       tempProduct: {},
       // 此項商品是否為新增商品
-      isNew: false,
+      isNew: false
     };
   },
   methods: {
     // admin取得商品列表
     getProducts() {
-      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/products`;
+      const api = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/admin/products`;
       const vm = this;
       this.$http.get(api).then(response => {
         // console.log(response.data.products);
@@ -194,27 +199,47 @@ export default {
       $("#productModal").modal("show");
     },
     // 商品建立(新增)
-    updateProduct(){
-      let api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product`;
-      let httpMethod = 'post';
+    updateProduct() {
+      let api = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/admin/product`;
+      let httpMethod = "post";
       const vm = this;
       if (vm.isNew === false) {
-        api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
-        httpMethod = 'put';
+        api = `${process.env.APIPATH}/api/${
+          process.env.CUSTOMPATH
+        }/admin/product/${vm.tempProduct.id}`;
+        httpMethod = "put";
       }
       // 注意 post 傳2個參數，此 API 是傳物件形式 不能直接傳 vm.tempProduct
-      this.$http[httpMethod](api, {data: vm.tempProduct}).then( response => {
-        console.log(response.data)
+      this.$http[httpMethod](api, { data: vm.tempProduct }).then(response => {
+        console.log(response.data);
         // 如果新增成功
         if (response.data.success) {
           $("#productModal").modal("hide");
           // 重新取得遠端資料
           vm.getProducts();
         } else {
-          console.log('新增失敗');
+          console.log("新增失敗");
         }
       });
     },
+    openDelProductModal(item) {
+      const vm = this;
+      $("#delProductModal").modal("show");
+      vm.tempProduct = Object.assign({}, item);
+    },
+    // 刪除商品
+    delProduct(){
+      const vm = this;
+      let api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/admin/product/${vm.tempProduct.id}`;
+      this.$http.delete(api).then(res => {
+        // console.log(res,vm.tempProduct.id)
+        $("#delProductModal").modal("hide");
+        // 重新取得商品列表
+        this.getProducts();
+      })
+    }
   },
   created() {
     this.getProducts();
