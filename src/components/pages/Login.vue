@@ -36,7 +36,7 @@ export default {
       const vm = this;
       this.$http.post(api, vm.user).then((response) => {
         //post(api ,vm.user) => vm.user是API規定要傳入參數
-        console.log(response.data);
+        // console.log(response.data);
         if(response.data.success){
           vm.$router.push('/admin/products');
         }

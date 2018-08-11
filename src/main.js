@@ -11,6 +11,7 @@ import 'bootstrap';
 // 載入自訂義內容
 import App from './App';
 import router from './router';
+import './eventBus';
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);

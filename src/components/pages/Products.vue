@@ -276,6 +276,10 @@ export default {
           // console.log(vm.tempProduct);
           // 把路徑強制寫入跟圖片網址做雙向綁定
           vm.$set(vm.tempProduct, 'imageUrl', res.data.imageUrl);
+        } else if (res.data.success === false && res.data.message.code === 'LIMIT_FILE_SIZE') {
+          this.$bus.$emit('message:push', '檔案容量過大', 'danger');
+        } else {
+          this.$bus.$emit('message:push', res.data.message, 'danger');
         }
       })
     }
