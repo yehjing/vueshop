@@ -12,12 +12,14 @@ import 'bootstrap';
 import App from './App';
 import router from './router';
 import './eventBus';
+import currencyFilter from './filters/currency';
 
 Vue.config.productionTip = false;
 Vue.use(VueAxios, axios);
 
 // 全愈啟用 Loading 元件
 Vue.component('Loading', Loading);
+Vue.filter('currency', currencyFilter);
 
 /* eslint-disable no-new */
 new Vue({
