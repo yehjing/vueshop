@@ -9,6 +9,7 @@ import CustomerOrders from '@/components/pages/CustomerOrders';
 Vue.use(Router);
 
 export default new Router({
+  linkActiveClass: 'active',
   routes: [
     {
       // 假如用戶輸入的路徑不是所定義的，就導回login頁面

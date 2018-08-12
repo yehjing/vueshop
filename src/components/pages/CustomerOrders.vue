@@ -26,7 +26,7 @@
               <i class="fas fa-spinner fa-spin" v-if="status.loadingItem === item.id"></i>
               查看更多
             </button>
-            <button type="button" class="btn btn-outline-danger btn-sm ml-auto">
+            <button type="button" class="btn btn-outline-danger btn-sm ml-auto" @click="addToCart(item.id)">
               <i class="fas fa-spinner fa-spin" v-if="status.loadingItem === item.id"></i>
               加到購物車
             </button>
@@ -67,14 +67,63 @@
               小計 <strong>{{ product.num * product.price }}</strong> 元
             </div>
             <button type="button" class="btn btn-primary"
-              @click="addtoCart(product.id, product.num)">
-              <!-- <i class="fas fa-spinner fa-spin" v-if="product.id === status.loadingItem"></i> -->
+              @click="addToCart(product.id, product.num)">
+              <i class="fas fa-spinner fa-spin" v-if="product.id === status.loadingItem"></i>
               加到購物車
             </button>
           </div>
         </div>
       </div>
     </div>
+    <!-- 購物車列表 start -->
+    <div class="my-5 row justify-content-center">
+      <div class="col-md-6">
+        <table class="table">
+          <thead>
+            <th></th>
+            <th>品名</th>
+            <th>數量</th>
+            <th class="text-right">單價</th>
+          </thead>
+          <tbody>
+            <tr v-for="item in cart.carts" :key="item.id" v-if="cart.carts">
+              <td class="align-middle">
+                <button type="button" class="btn btn-outline-danger btn-sm">
+                  <i class="far fa-trash-alt"></i>
+                </button>
+              </td>
+              <td class="align-middle">
+                {{ item.product.title }}
+                <!-- <div class="text-success" v-if="item.coupon">
+                  已套用優惠券
+                </div> -->
+              </td>
+              <td class="align-middle">{{ item.qty }}/{{ item.product.unit }}</td>
+              <td class="align-middle text-right">{{ item.final_total }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-right">總計</td>
+              <td class="text-right">{{ cart.total }}</td>
+            </tr>
+            <tr v-if="cart.total !== cart.final_total">
+              <td colspan="3" class="text-right text-success">折扣價</td>
+              <td class="text-right text-success">{{ cart.final_total }}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="input-group mb-3 input-group-sm">
+          <input type="text" class="form-control" placeholder="請輸入優惠碼">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button">
+              套用優惠碼
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 購物車列表 end -->
   </div>
 </template>
 
@@ -89,10 +138,12 @@ export default {
       isLoading: false,
       status:{
         loadingItem:''
-      }
+      },
+      cart: {},
     };
   },
   methods:{
+    // 取得產品列表
     getProducts() {
       const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products/all`;
       const vm = this;
@@ -110,14 +161,43 @@ export default {
       this.$http.get(api).then(response => {
         // 先取得資料再開啟 Modal
         vm.product = response.data.product;
-        console.log(response.data)
         $('#productModal').modal('show');
+        // console.log(response.data);
         vm.status.loadingItem = '';
+      });
+    },
+    // 加入購物車 => 會有2種行為 先加入購物車 再把購物車裡的資料取回
+    addToCart(id, qty = 1){
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
+      const vm = this;
+      vm.status.loadingItem = id;
+      const cart = {
+        product_id: id,
+        qty,
+      }
+      this.$http.post(api, { data: cart }).then(response => {
+        // console.log(response.data)
+        vm.status.loadingItem = '';
+        // 加入購物車後，記得要把購物車內容取回來
+        vm.getCart();
+        $('#productModal').modal('hide');
+      });
+    },
+    // 取回購物車裡的資料
+    getCart() {
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
+      const vm = this;
+      this.$http.get(api).then(response => {
+        // console.log(response.data.data)
+        vm.cart = response.data.data;
+        vm.isLoading = false;
       });
     }
   },
   created() {
     this.getProducts();
+    // 在開始時，先取得購物車內容
+    this.getCart();
   }
 }
 
