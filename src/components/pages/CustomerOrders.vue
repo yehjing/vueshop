@@ -16,9 +16,10 @@
             </h5>
             <p class="card-text">{{ item.description }}</p>
             <div class="d-flex justify-content-between align-items-baseline">
-              <div class="h5" v-if="!item.price">{{ item.origin_price }}</div>
-              <del class="h6" v-if="item.price">原價 {{ item.origin_price }} 元</del>
-              <div class="h5" v-if="item.price">現在只要 {{ item.price }} 元</div>
+              <div class="h5" v-if="!item.origin_price">{{ item.origin_price }}</div>
+              <del class="h6" v-if="item.origin_price">原價 {{ item.origin_price | currency }} 元</del>
+              <div class="h5" v-if="item.price && item.origin_price">現在只要 {{ item.price | currency }} 元</div>
+              <div class="h5" v-else> {{ item.price | currency }} 元</div>
             </div>
           </div>
           <div class="card-footer d-flex">
@@ -52,9 +53,10 @@
               <footer class="blockquote-footer mt-3">{{ product.content }}</footer>
             </blockquote>
             <div class="d-flex justify-content-between align-items-baseline">
-              <div class="h4" v-if="!product.price">{{ product.origin_price }} 元</div>
-              <del class="h6" v-if="product.price">原價 {{ product.origin_price }} 元</del>
-              <div class="h4" v-if="product.price">現在只要 {{ product.price }} 元</div>
+              <div class="h4" v-if="!product.origin_price">{{ product.origin_price }}</div>
+              <del class="h6" v-if="product.origin_price">原價 {{ product.origin_price | currency }} 元</del>
+              <div class="h4" v-if="product.price && product.origin_price">現在只要 {{ product.price | currency }} 元</div>
+              <div class="h4" v-else>{{ product.price | currency }} 元</div>
             </div>
             <select name="" class="form-control mt-3" v-model="product.num">
               <option :value="num" v-for="num in 10" :key="num">
@@ -64,7 +66,7 @@
           </div>
           <div class="modal-footer">
             <div class="text-muted text-nowrap mr-3">
-              小計 <strong>{{ product.num * product.price }}</strong> 元
+              小計 <strong>{{ product.num * product.price | currency }}</strong> 元
             </div>
             <button type="button" class="btn btn-primary"
               @click="addToCart(product.id, product.num)">
@@ -104,17 +106,17 @@
                 </div> -->
               </td>
               <td class="align-middle">{{ item.qty }}/{{ item.product.unit }}</td>
-              <td class="align-middle text-right">{{ item.final_total }}</td>
+              <td class="align-middle text-right">{{ item.final_total | currency }}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
               <td colspan="3" class="text-right">總計</td>
-              <td class="text-right">{{ cart.total }}</td>
+              <td class="text-right">{{ cart.total | currency }}</td>
             </tr>
             <tr v-if="cart.total !== cart.final_total">
               <td colspan="3" class="text-right text-success">折扣價</td>
-              <td class="text-right text-success">{{ cart.final_total }}</td>
+              <td class="text-right text-success">{{ cart.final_total | currency }}</td>
             </tr>
           </tfoot>
         </table>
@@ -166,6 +168,8 @@ export default {
       this.$http.get(api).then(response => {
         // 先取得資料再開啟 Modal
         vm.product = response.data.product;
+        // 點擊查看更多預設商品數量為 1
+        vm.product.num = 1 ;
         $('#productModal').modal('show');
         // console.log(response.data);
         vm.status.loadingItem = '';

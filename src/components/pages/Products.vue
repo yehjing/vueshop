@@ -41,7 +41,7 @@
     <!-- 分頁 start -->
     <nav aria-label="Page navigation example">
       <ul class="pagination">
-        <li class="page-item" :class="{'disabled' : !pagination.has_pre}">
+        <li class="page-item" :class="{ 'disabled' : !pagination.has_pre }">
           <a class="page-link" href="#" aria-label="Previous" 
             @click.prevent="getProducts(pagination.current_page - 1)">
             <span aria-hidden="true">&laquo;</span>
