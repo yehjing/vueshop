@@ -80,7 +80,11 @@
       <div class="col-md-6">
         <table class="table">
           <thead>
-            <th></th>
+            <th>
+              <button type="button" class="btn btn-outline-danger btn-sm">
+                <i class="far fa-trash-alt"></i>
+              </button>
+            </th>
             <th>品名</th>
             <th>數量</th>
             <th class="text-right">單價</th>
@@ -88,7 +92,8 @@
           <tbody>
             <tr v-for="item in cart.carts" :key="item.id" v-if="cart.carts">
               <td class="align-middle">
-                <button type="button" class="btn btn-outline-danger btn-sm">
+                <button type="button" class="btn btn-outline-danger btn-sm"
+                  @click="removeCartItem(item.id)">
                   <i class="far fa-trash-alt"></i>
                 </button>
               </td>
@@ -187,12 +192,23 @@ export default {
     getCart() {
       const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
       const vm = this;
+      // vm.isLoading = true;
       this.$http.get(api).then(response => {
         // console.log(response.data.data)
         vm.cart = response.data.data;
+        // vm.isLoading = false;
+      });
+    },
+    // 刪除購物車
+    removeCartItem(id) {
+      const vm = this;
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
+      vm.isLoading = true;
+      this.$http.delete(api).then(response => {
+        vm.getCart();
         vm.isLoading = false;
       });
-    }
+    },
   },
   created() {
     this.getProducts();
