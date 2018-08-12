@@ -4,7 +4,7 @@
     <loading :active.sync="isLoading"></loading>
     <!-- Loading 套件 end-->
     <div class="text-right">
-      <button class="mt-4 btn btn-success" @click="openProductModal(true)">建立新的產品</button>
+      <button class="mt-4 btn btn-primary" @click="openProductModal(true)">建立新的產品</button>
     </div>
     <table class="table mt-4">
       <thead>
@@ -215,7 +215,7 @@ export default {
       const vm = this;
       vm.isLoading = true;
       this.$http.get(api).then(response => {
-        console.log(response.data);
+        // console.log(response.data);
         vm.isLoading = false;
         // 把商品列表存入data陣列中
         vm.products = response.data.products;
@@ -250,7 +250,7 @@ export default {
       }
       // 注意 post 傳2個參數，此 API 是傳物件形式 不能直接傳 vm.tempProduct
       this.$http[httpMethod](api, { data: vm.tempProduct }).then(response => {
-        console.log(response.data);
+        // console.log(response.data);
         // 如果新增成功
         if (response.data.success) {
           $("#productModal").modal("hide");
@@ -316,3 +316,8 @@ export default {
   }
 };
 </script>
+<style>
+  *{
+    font-family: '微軟正黑體';
+  }
+</style>

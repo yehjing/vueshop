@@ -4,6 +4,7 @@ import Router from 'vue-router';
 import Login from '@/components/pages/Login';
 import Dashboard from '@/components/Dashboard';
 import Products from '@/components/pages/Products';
+import CustomerOrders from '@/components/pages/CustomerOrders';
 
 Vue.use(Router);
 
@@ -31,13 +32,27 @@ export default new Router({
       path: '/admin',
       name: 'Dashboard',
       component: Dashboard,
-      children: [{
-        path: '/admin/products',
-        name: 'Products',
-        component: Products,
-        // 路由元信息，確保進入此頁面時是需要被驗證
-        meta: { requiresAuth: true },
-      }],
+      children: [
+        {
+          path: 'products',
+          name: 'Products',
+          component: Products,
+          // 路由元信息，確保進入此頁面時是需要被驗證
+          meta: { requiresAuth: true },
+        }
+      ],
     },
+    {
+      path: '/',
+      name: 'Dashboard',
+      component: Dashboard,
+      children: [
+        {
+          path: 'customer_orders', 
+          name: 'CustomerOrders',
+          component: CustomerOrders,
+        }
+      ],
+    }
   ],
 });
