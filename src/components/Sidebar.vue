@@ -12,10 +12,10 @@
           <router-link class="nav-link" to="/admin/products"><i class="fas fa-box-open mr-2"></i>產品列表</router-link>
         </li>
         <li class="nav-item">
-          <!-- <router-link class="nav-link">訂單列表</router-link> -->
+          <router-link to="/admin/orders" class="nav-link"><i class="far fa-list-alt mr-2"></i>訂單列表</router-link>
         </li>
         <li class="nav-item">
-          <!-- <router-link class="nav-link">優惠券</router-link> -->
+          <router-link to="/admin/coupons" class="nav-link"><i class="fas fa-ticket-alt mr-2"></i>優惠券</router-link>
         </li>
       </ul>
       <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -26,7 +26,7 @@
       </h6>
       <ul class="nav flex-column mb-2">
         <li class="nav-item">
-          <router-link class="nav-link" to="/customer_orders">模擬訂單</router-link>
+          <router-link class="nav-link" to="/customer_orders"><i class="fas fa-shopping-cart mr-2"></i>模擬訂單</router-link>
         </li>
       </ul>
     </div>
