@@ -101,9 +101,9 @@
               </td>
               <td class="align-middle">
                 {{ item.product.title }}
-                <!-- <div class="text-success" v-if="item.coupon">
+                <small class="text-success d-block" v-if="item.coupon">
                   已套用優惠券
-                </div> -->
+                </small>
               </td>
               <td class="align-middle">{{ item.qty }}/{{ item.product.unit }}</td>
               <td class="align-middle text-right">{{ item.final_total | currency }}</td>
@@ -121,9 +121,9 @@
           </tfoot>
         </table>
         <div class="input-group mb-3 input-group-sm">
-          <input type="text" class="form-control" placeholder="請輸入優惠碼">
+          <input type="text" class="form-control" v-model="couponCode" placeholder="請輸入優惠碼">
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button">
+            <button class="btn btn-outline-secondary" type="button" @click="addCouponCode">
               套用優惠碼
             </button>
           </div>
@@ -131,28 +131,80 @@
       </div>
     </div>
     <!-- 購物車列表 end -->
+    <div class="my-5 row justify-content-center">
+        <form class="col-md-6" @submit.prevent="createOrder">
+          <div class="form-group">
+            <label for="useremail">Email</label>
+            <input type="email" class="form-control" name="email" id="useremail" placeholder="請輸入 Email"
+              :class="{'is-invalid' : errors.has('email')}"
+              v-model="form.user.email" v-validate="'required|email'">
+            <span class="text-danger" v-if="errors.has('email')">{{ errors.first('email') }}</span>
+          </div>
+        
+          <div class="form-group">
+            <label for="username">收件人姓名</label>
+            <input type="text" class="form-control" name="name" id="username" placeholder="輸入姓名"
+              :class="{'is-invalid' : errors.has('name')}"
+              v-model="form.user.name" v-validate="'required'">
+            <span class="text-danger" v-if="errors.has('name')">姓名必須填入</span>
+          </div>
+        
+          <div class="form-group">
+            <label for="usertel">收件人電話</label>
+            <input type="tel" class="form-control" id="usertel" placeholder="請輸入電話">
+          </div>
+        
+          <div class="form-group">
+            <label for="useraddress">收件人地址</label>
+            <input type="address" class="form-control" name="address" id="useraddress" placeholder="請輸入地址"
+              v-model="form.user.address" v-validate="'required'"
+              :class="{'is-invalid' : errors.has('address')}">
+            <span class="text-danger" v-if="errors.has('address')">收件人地址不能留空</span>
+          </div>
+        
+          <div class="form-group">
+            <label for="useraddress">留言</label>
+            <textarea name="" id="" class="form-control" cols="30" rows="10"></textarea>
+          </div>
+          <div class="text-right">
+            <button class="btn btn-danger">送出訂單</button>
+          </div>
+        </form>
+      </div>
   </div>
 </template>
 
 <script>
-import $ from 'jquery';
+import $ from "jquery";
 
 export default {
   data() {
-    return{
+    return {
       products: [],
       product: {},
       isLoading: false,
-      status:{
-        loadingItem:''
+      status: {
+        loadingItem: ""
       },
       cart: {},
+      couponCode: "",
+      form: {
+        user: {
+          name: "",
+          email: "",
+          tel: "",
+          address: ""
+        },
+        message: ""
+      }
     };
   },
-  methods:{
+  methods: {
     // 取得產品列表
     getProducts() {
-      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/products/all`;
+      const api = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/products/all`;
       const vm = this;
       vm.isLoading = true;
       this.$http.get(api).then(response => {
@@ -162,34 +214,36 @@ export default {
     },
     // 取得單一商品細節 開啟 Modal
     getProduct(id) {
-      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/product/${id}`;
+      const api = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/product/${id}`;
       const vm = this;
       vm.status.loadingItem = id;
       this.$http.get(api).then(response => {
         // 先取得資料再開啟 Modal
         vm.product = response.data.product;
         // 點擊查看更多預設商品數量為 1
-        vm.product.num = 1 ;
-        $('#productModal').modal('show');
+        vm.product.num = 1;
+        $("#productModal").modal("show");
         // console.log(response.data);
-        vm.status.loadingItem = '';
+        vm.status.loadingItem = "";
       });
     },
     // 加入購物車 => 會有2種行為 先加入購物車 再把購物車裡的資料取回
-    addToCart(id, qty = 1){
+    addToCart(id, qty = 1) {
       const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart`;
       const vm = this;
       vm.status.loadingItem = id;
       const cart = {
         product_id: id,
-        qty,
-      }
+        qty
+      };
       this.$http.post(api, { data: cart }).then(response => {
         // console.log(response.data)
-        vm.status.loadingItem = '';
+        vm.status.loadingItem = "";
         // 加入購物車後，記得要把購物車內容取回來
         vm.getCart();
-        $('#productModal').modal('hide');
+        $("#productModal").modal("hide");
       });
     },
     // 取回購物車裡的資料
@@ -206,24 +260,56 @@ export default {
     // 刪除購物車
     removeCartItem(id) {
       const vm = this;
-      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/cart/${id}`;
+      const api = `${process.env.APIPATH}/api/${
+        process.env.CUSTOMPATH
+      }/cart/${id}`;
       vm.isLoading = true;
       this.$http.delete(api).then(response => {
         vm.getCart();
         vm.isLoading = false;
       });
     },
+
+    // 套用優惠券
+    addCouponCode() {
+      const vm = this;
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/coupon`;
+      const coupon = {
+        code: vm.couponCode
+      };
+      vm.isLoading = true;
+      this.$http.post(api, { data: coupon }).then(response => {
+        // console.log(response.data)
+        vm.getCart();
+        vm.isLoading = false;
+      });
+    },
+    createOrder() {
+      const vm = this;
+      const api = `${process.env.APIPATH}/api/${process.env.CUSTOMPATH}/order`;
+      // vm.isLoading = true;
+      this.$validator.validate().then((result) => {
+        if (result) {
+          this.$http.post(api, { data: vm.form }).then(response => {
+            console.log(response.data);
+            // vm.getCart();
+            // vm.isLoading = false;
+          });
+        }else{
+          console.log('欄位不完整')
+        }
+      });
+    }
   },
   created() {
     this.getProducts();
     // 在開始時，先取得購物車內容
     this.getCart();
   }
-}
-
+};
 </script>
 <style scoped>
-.blockquote-footer:before{
-  content:''
+.blockquote-footer:before {
+  content: "";
 }
 </style>
