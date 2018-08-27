@@ -292,6 +292,9 @@ export default {
         if (result) {
           this.$http.post(api, { data: vm.form }).then(response => {
             console.log(response.data);
+            if(response.data.success) {
+              vm.$router.push(`/customer_checkout/${response.data.orderId}`)
+            }
             // vm.getCart();
             // vm.isLoading = false;
           });
